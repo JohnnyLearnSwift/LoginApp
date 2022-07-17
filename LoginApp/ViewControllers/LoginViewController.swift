@@ -9,9 +9,17 @@ import UIKit
 
 class LoginViewController: UIViewController, UITextFieldDelegate {
     
+    //MARK: Аутлеты
     @IBOutlet var userTextField: UITextField!
     @IBOutlet var passwordTextField: UITextField!
     
+    //MARK: Публичные свойства
+    let userCV = CV.getCV()
+    //MARK: Приватные свойства
+    //MARK: Инициализаторы
+//    init() {
+//    }
+    //MARK: Методы переопределения род класса
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -34,26 +42,16 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super .touchesBegan(touches, with: event)
-    }
-    
-    @IBAction func showUserButtonPressed() {
-        showAlert(title: "Login", message: "Jack")
-    }
-    
-    @IBAction func showPasswordButtonPressed() {
-        showAlert(title: "Password", message: "1234")
-    }
-    
-    @IBAction func unwind(for segue: UIStoryboardSegue) {
-        passwordTextField.text = ""
+//        super .touchesBegan(touches, with: event)
+        self.view.endEditing(true)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if let nextField = textField.superview?.viewWithTag(textField.tag + 1) as? UITextField {
                  nextField.becomeFirstResponder()
               } else {
-                  if userTextField.text == "Jack" && passwordTextField.text == "1234" {
+                  if userTextField.text == userCV.authorizationInfo.login &&
+                        passwordTextField.text == userCV.authorizationInfo.password {
                       performSegue(withIdentifier: "login", sender: self)
                   }
               }
@@ -62,12 +60,13 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let welcomeVC = segue.destination as? WelcomeViewController else { return }
-        welcomeVC.username = userTextField.text
+        welcomeVC.userCV = userCV
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         if identifier == "login" {
-            if userTextField.text == "Jack" && passwordTextField.text == "1234" {
+            if userTextField.text == userCV.authorizationInfo.login &&
+                passwordTextField.text == userCV.authorizationInfo.password {
                 return true
             } else {
                 showAlert(title: "Failed attempt", message: "Wrong login or password")
@@ -76,6 +75,18 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             }
         }
         return false
+    }
+    //MARK: IBAction методы
+    @IBAction func showUserButtonPressed() {
+        showAlert(title: "Login", message: userCV.authorizationInfo.login)
+    }
+    
+    @IBAction func showPasswordButtonPressed() {
+        showAlert(title: "Password", message: userCV.authorizationInfo.password)
+    }
+    
+    @IBAction func unwind(for segue: UIStoryboardSegue) {
+        passwordTextField.text = ""
     }
 
 }
